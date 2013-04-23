@@ -59,17 +59,15 @@ mkd () {
 	mkdir "$1" && cd "$1" && ls
 }
 
-#alias cd="cdl"
-#alias mkdir="mkd"
 alias python="python3"
 alias data="cd /media/data"
-alias bsdgames="cat ~/.bsdgames"
-alias mud="telnet www.ateraan.com 4002"
+# alias bsdgames="cat ~/.bsdgames"
 alias showp="sudo dpkg --get-selections"
 alias m="cd /home/moriz/dev/python/mbc/"
 alias cortex="/home/moriz/dl/cortex/cortex"
 alias r="xrdb ~/.Xresources"
 alias startx='startx &> ~/.xlog'
+alias sshuni="ssh a1208777@almighty.cs.univie.ac.at"
 
 xset r rate 200 30
 bindkey -M viins 'jj' vi-cmd-mode
