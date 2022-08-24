@@ -1,10 +1,8 @@
 "GENERAL configuration
 
-"set t_Co=16
 syntax on
 set background=dark
 set autoindent
-"set number
 set wrap
 set linebreak
 "set tabs to insert 2 spaces
@@ -22,6 +20,8 @@ set nocompatible
 set clipboard=unnamed
 "statusline
 set colorcolumn=100
+set title titlestring=
+set number | set relativenumber
 
 set laststatus=2
 set statusline=%t       "tail of the filename
@@ -40,38 +40,42 @@ set statusline+=\ %P    "percent through file
 set encoding=utf-8
 set fileencoding=utf-8
 
-"VUNDLE configuration
-
-
-
-set rtp+=~/.vim/bundle/Vundle.vim/
+set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
-Bundle 'gmarik/vundle'
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'tikhomirov/vim-glsl'
-Bundle 'chemzqm/vim-jsx-improve'
-Bundle 'ctrlpvim/ctrlp.vim'
-Bundle 'Quramy/tsuquyomi'
-Bundle 'evidens/vim-twig'
-Bundle 'jwalton512/vim-blade'
-Bundle 'jparise/vim-graphql'
-Bundle 'dense-analysis/ale'
-Bundle 'udalov/kotlin-vim'
-Bundle 'prettier/vim-prettier', {
+
+Plugin 'gmarik/vundle'
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'tikhomirov/vim-glsl'
+Plugin 'chemzqm/vim-jsx-improve'
+Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'evidens/vim-twig'
+Plugin 'jwalton512/vim-blade'
+Plugin 'jparise/vim-graphql'
+Plugin 'udalov/kotlin-vim'
+Plugin 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'branch': 'release/0.x'
   \ }
-Bundle 'jxnblk/vim-mdx-js'
-Bundle 'leafgarland/typescript-vim'
-Bundle 'peitalin/vim-jsx-typescript'
+Plugin 'jxnblk/vim-mdx-js'
+Plugin 'leafgarland/typescript-vim'
+Plugin 'peitalin/vim-jsx-typescript'
+Plugin 'tpope/vim-surround'
+Plugin 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+" Plugin 'github/copilot.vim'
+Plugin 'gioele/vim-autoswap'
+
+call vundle#end()            " required
 
 
-call vundle#end()
 colorscheme solarized
+
 syntax enable
 filetype plugin indent on
+" solarized options
+let g:solarized_visibility = "high"
+let g:solarized_contrast = "high"
 
 let g:jsx_ext_required = 0
 
@@ -88,11 +92,8 @@ inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 
 "hex editor with C-h
-map <C-h> :%!xxd
-map <C-j> :%!xxd -r
-
-map <C-t> :ALEToggle<CR>
-autocmd BufEnter *.php ALEDisable
+" map <C-h> :%!xxd
+" map <C-j> :%!xxd -r
 
 "highlight non-breaking space
 au VimEnter,BufWinEnter * syn match ErrorMsg " "
@@ -170,15 +171,6 @@ fun! Interleave(...) range
 endfun
 
 highlight clear SignColumn
-let g:ale_sign_column_always = 1
-
-let g:ale_linters = {
-\   'javascript': ['eslint'],
-\}
-
-let g:ale_fixers = {
-\   'javascript': ['eslint'],
-\}
 
 
 " new style vim 8 plugins
@@ -191,16 +183,32 @@ packloadall
 silent! helptags ALL
 
 autocmd BufNewFile,BufRead *.tsx set filetype=typescriptreact
+autocmd BufNewFile,BufRead *.ts set filetype=typescriptreact
 " autocmd BufRead,BufNewFile *.tsx setlocal syntax=javascript
 " autocmd BufRead,BufNewFile *.ts setlocal filetype=javascript
 autocmd BufRead,BufNewFile *.svelte setlocal filetype=html
+" autocmd BufNewFile,BufRead *.js set filetype=typescriptreact
+" autocmd BufNewFile,BufRead *.jsx set filetype=typescriptreact
 
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](node_modules|lib|build)$',
+  \ 'dir':  '\v[\/](node_modules|build|dist|.next|.git|android)$',
   \ 'file': '\v\.(exe|so|dll|swp)$',
   \ }
 
 let g:prettier#autoformat = 0
 if filereadable(findfile('.prettierrc.js', '.;')) || filereadable(findfile('.prettierrc', '.;')) 
-  autocmd BufWritePre *.js,*.ts,.jsx,*.json,*.css,*.scss,*.less,*.graphql,*.tsx PrettierAsync
+  autocmd BufWritePre *.js,*.ts,*.jsx,*.json,*.css,*.scss,*.less,*.graphql,*.tsx Prettier
 endif
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
