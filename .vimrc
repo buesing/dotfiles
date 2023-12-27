@@ -11,7 +11,6 @@ set shiftwidth=2
 set tabstop=2
 set softtabstop=2
 "view cursor at beginning of tab in normal mode
-set list lcs=tab:\ \ 
 set backspace=indent,eol,start
 "filetype plugin on
 filetype off
@@ -59,12 +58,13 @@ Plugin 'prettier/vim-prettier', {
   \ 'branch': 'release/0.x'
   \ }
 Plugin 'jxnblk/vim-mdx-js'
-Plugin 'leafgarland/typescript-vim'
-Plugin 'peitalin/vim-jsx-typescript'
+Plugin 'HerringtonDarkholme/yats.vim'
 Plugin 'tpope/vim-surround'
-Plugin 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
-" Plugin 'github/copilot.vim'
+Plugin 'neoclide/coc.nvim', {'branch': 'release'}
+Plugin 'github/copilot.vim'
 Plugin 'gioele/vim-autoswap'
+Plugin 'pantharshit00/vim-prisma'
+Plugin 'wuelnerdotexe/vim-astro'
 
 call vundle#end()            " required
 
@@ -94,9 +94,6 @@ inoremap <c-w> <c-g>u<c-w>
 "hex editor with C-h
 " map <C-h> :%!xxd
 " map <C-j> :%!xxd -r
-
-"highlight non-breaking space
-au VimEnter,BufWinEnter * syn match ErrorMsg " "
 
 " avoid having to use escape key
 imap jj <Esc>
@@ -187,11 +184,12 @@ autocmd BufNewFile,BufRead *.ts set filetype=typescriptreact
 " autocmd BufRead,BufNewFile *.tsx setlocal syntax=javascript
 " autocmd BufRead,BufNewFile *.ts setlocal filetype=javascript
 autocmd BufRead,BufNewFile *.svelte setlocal filetype=html
-" autocmd BufNewFile,BufRead *.js set filetype=typescriptreact
-" autocmd BufNewFile,BufRead *.jsx set filetype=typescriptreact
+autocmd BufRead,BufNewFile *.js set filetype=javascriptreact
+autocmd BufRead,BufNewFile *.jsx set filetype=javascriptreact
+
 
 let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/](node_modules|build|dist|.next|.git|android)$',
+  \ 'dir':  '\v[\/](node_modules|build|dist|.next|.git|android|node-dist|temp)$',
   \ 'file': '\v\.(exe|so|dll|swp)$',
   \ }
 
@@ -201,14 +199,23 @@ if filereadable(findfile('.prettierrc.js', '.;')) || filereadable(findfile('.pre
 endif
 
 " Use tab for trigger completion with characters ahead and navigate.
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-  \ pumvisible() ? "\<C-n>" :
-  \ <SID>check_back_space() ? "\<TAB>" :
-  \ coc#refresh()
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+highlight UnwantedSpaces ctermbg=red guibg=red
+match UnwantedSpaces /[  ]/ " (CTRL+V x a 0)
+
+let g:copilot_node_command = "/Users/moriz/.nvm/versions/node/v16.17.1/bin/node"
+
